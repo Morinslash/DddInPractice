@@ -1,8 +1,10 @@
+using NHibernate.Proxy;
+
 namespace DddInPractice.Logic;
 
 public abstract class Entity
 {
-    public long Id { get; private set; }
+    public virtual long Id { get; protected set; }
 
     public override bool Equals(object obj)
     {
@@ -17,7 +19,7 @@ public abstract class Entity
             return true;
         }
 
-        if (GetType()!= other.GetType())
+        if (GetRealType() != other.GetRealType())
         {
             return false;
         }
@@ -47,4 +49,6 @@ public abstract class Entity
     public static bool operator !=(Entity a, Entity b) => !(a == b);
 
     public override int GetHashCode() => (GetType().ToString() + Id).GetHashCode();
+
+    private Type GetRealType() => NHibernateProxyHelper.GetClassWithoutInitializingProxy(this);
 }

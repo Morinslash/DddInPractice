@@ -101,4 +101,17 @@ public class MoneySpecs
 
         action.Should().Throw<InvalidOperationException>();
     }
+
+    [Theory]
+    [InlineData(1, 0, 0, 0, 0, 0, "¢1")]
+    [InlineData(0, 0, 0, 1, 0, 0, "$1.00")]
+    [InlineData(1, 0, 0, 1, 0, 0, "$1.01")]
+    [InlineData(0, 0, 2, 1, 0, 0, "$1.50")]
+    public void To_String_Should_Return_Amount_Of_Money(int oneCent, int tenCent, int quarter, int oneDollar,
+        int fiveDollar, int twentyDollar, string expectedString)
+    {
+        var money = new Money(oneCent, tenCent, quarter, oneDollar, fiveDollar, twentyDollar);
+        money.ToString().Should().Be(expectedString);
+    }
+    
 }
