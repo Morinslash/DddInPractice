@@ -50,5 +50,6 @@ public abstract class Entity
 
     public override int GetHashCode() => (GetType().ToString() + Id).GetHashCode();
 
+    // here we are leaking the persistence specific code to the Domain section, be careful about it!
     private Type GetRealType() => NHibernateProxyHelper.GetClassWithoutInitializingProxy(this);
 }
