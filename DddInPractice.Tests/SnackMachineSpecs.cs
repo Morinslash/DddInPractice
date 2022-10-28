@@ -1,6 +1,7 @@
 using DddInPractice.Logic;
 using FluentAssertions;
 using static DddInPractice.Logic.Money;
+using static DddInPractice.Logic.Snack;
 
 namespace DddInPractice.Tests;
 
@@ -42,7 +43,7 @@ public class SnackMachineSpecs
     public void BuySnack_Trades_Inserted_Money_For_A_Snack()
     {
         var snackMachine = new SnackMachine();
-        snackMachine.LoadSnacks(1, new SnackPile(new Snack("Some snack"), 10, 1m));
+        snackMachine.LoadSnacks(1, new SnackPile(Chocolate, 10, 1m));
         snackMachine.InsertMoney(Dollar);
         snackMachine.InsertMoney(Dollar);
 
@@ -64,7 +65,7 @@ public class SnackMachineSpecs
     public void Cannot_Make_Purchase_If_Not_Enough_Money_Inserted()
     {
         var snackMachine = new SnackMachine();
-        snackMachine.LoadSnacks(1, new SnackPile(new Snack("Some snack"), 1, 2m));
+        snackMachine.LoadSnacks(1, new SnackPile(Chocolate, 1, 2m));
         snackMachine.InsertMoney(Dollar);
 
         Action action = () => snackMachine.BuySnack(1);
@@ -92,7 +93,7 @@ public class SnackMachineSpecs
     public void After_Purchase_Change_Is_Returned()
     {
         var snackMachine = new SnackMachine();
-        snackMachine.LoadSnacks(1, new SnackPile(new Snack("Some snack"), 1, 0.5m));
+        snackMachine.LoadSnacks(1, new SnackPile(Chocolate, 1, 0.5m));
         snackMachine.LoadMoney(TenCent * 10);
         
         snackMachine.InsertMoney(Dollar);
@@ -107,7 +108,7 @@ public class SnackMachineSpecs
     public void Cannot_Buy_Snack_If_Not_Enough_Change()
     {
         var snackMachine = new SnackMachine();
-        snackMachine.LoadSnacks(1, new SnackPile(new Snack("Some snack"), 1, 0.5m));
+        snackMachine.LoadSnacks(1, new SnackPile(Chocolate, 1, 0.5m));
         snackMachine.InsertMoney(Dollar);
         Action action = () => snackMachine.BuySnack(1);
         action.Should().Throw<InvalidOperationException>();

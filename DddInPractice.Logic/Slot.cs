@@ -1,4 +1,4 @@
-using NHibernate.Event;
+using static DddInPractice.Logic.Snack;
 
 namespace DddInPractice.Logic;
 
@@ -15,7 +15,7 @@ public class Slot : Entity
 
     public Slot(SnackMachine snackMachine, int position) : this()
     {
-        SnackPile = new SnackPile(null, 0, 0m);
+        SnackPile = SnackPile.Empty;
         SnackMachine = snackMachine;
         Position = position;
     }
