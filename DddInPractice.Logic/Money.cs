@@ -5,16 +5,17 @@ public class Money : ValueObject<Money>
     public static readonly Money None = new Money(0, 0, 0, 0, 0, 0);
     public static readonly Money Cent = new Money(1, 0, 0, 0, 0, 0);
     public static readonly Money TenCent = new Money(0, 1, 0, 0, 0, 0);
-    public static readonly Money Quarter= new Money(0, 0, 1, 0, 0, 0);
-    public static readonly Money Dollar= new Money(0, 0, 0, 1, 0, 0);
-    public static readonly Money FiveDollar= new Money(0, 0, 0, 0, 1, 0);
-    public static readonly Money TwentyDollar= new Money(0, 0, 0, 0, 0, 1);
+    public static readonly Money Quarter = new Money(0, 0, 1, 0, 0, 0);
+    public static readonly Money Dollar = new Money(0, 0, 0, 1, 0, 0);
+    public static readonly Money FiveDollar = new Money(0, 0, 0, 0, 1, 0);
+    public static readonly Money TwentyDollar = new Money(0, 0, 0, 0, 0, 1);
     public int OneCentCount { get; }
     public int TenCentCount { get; }
     public int QuarterCentCount { get; }
     public int OneDollarCount { get; }
     public int FiveDollarCount { get; }
     public int TwentyDollarCount { get; }
+
     public decimal Amount =>
         OneCentCount * 0.01m +
         TenCentCount * 0.10m +
@@ -22,8 +23,10 @@ public class Money : ValueObject<Money>
         OneDollarCount +
         FiveDollarCount * 5 +
         TwentyDollarCount * 20;
-    
-    private Money(){}
+
+    private Money()
+    {
+    }
 
     public Money(int oneCentCount, int tenCentCount, int quarterCentCount, int oneDollarCount, int fiveDollarCount,
         int twentyDollarCount) : this()
@@ -88,6 +91,18 @@ public class Money : ValueObject<Money>
             money1.FiveDollarCount - money2.FiveDollarCount,
             money1.TwentyDollarCount - money2.TwentyDollarCount);
     }
+    
+    public static Money operator *(Money money1, int multiplier)
+    {
+        Money sum = new Money(
+            money1.OneCentCount * multiplier,
+            money1.TenCentCount * multiplier,
+            money1.QuarterCentCount * multiplier,
+            money1.OneDollarCount * multiplier,
+            money1.FiveDollarCount * multiplier,
+            money1.TwentyDollarCount * multiplier);
+        return sum;
+    }
 
     protected override bool EqualsCore(Money other) =>
         OneCentCount == other.OneCentCount
@@ -119,5 +134,35 @@ public class Money : ValueObject<Money>
         }
 
         return "$" + Amount.ToString("0.00");
+    }
+
+    public Money Allocate(decimal amount)
+    {
+        int twentyDollarCount = Math.Min((int)(amount / 20), TwentyDollarCount);
+        amount = amount - twentyDollarCount * 20;
+
+        int fiveDollarCount = Math.Min((int)(amount / 5), FiveDollarCount);
+        amount = amount - fiveDollarCount * 5;
+
+        int oneDollarCount = Math.Min((int)amount, OneDollarCount);
+        amount = amount - oneDollarCount;
+
+        int quarterCount = Math.Min((int)(amount / 0.25m), QuarterCentCount);
+        amount = amount - quarterCount * 0.25m;
+
+        int tenCentCount = Math.Min((int)(amount / 0.1m), TenCentCount);
+        amount = amount - tenCentCount * 0.1m;
+
+        int oneCentCount = Math.Min((int)(amount / 0.01m), OneCentCount);
+
+        return new Money(
+            oneCentCount,
+            tenCentCount,
+            quarterCount,
+            oneDollarCount,
+            fiveDollarCount,
+            twentyDollarCount);
+
+        return new Money(oneCentCount, tenCentCount, quarterCount, oneDollarCount, fiveDollarCount, twentyDollarCount);
     }
 }

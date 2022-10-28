@@ -4,14 +4,14 @@ namespace DddInPractice.Logic;
 
 public class SnackMachine : AggregateRoot
 {
-    public virtual Money MoneyInside { get; protected set; } = None;
-    public virtual Money MoneyInTransaction { get; protected set; } = None;
+    public virtual Money MoneyInside { get; protected set; }
+    public virtual decimal MoneyInTransaction { get; protected set; }
     protected virtual List<Slot> Slots { get; set; }
 
     public SnackMachine()
     {
         MoneyInside = None;
-        MoneyInTransaction = None;
+        MoneyInTransaction = 0;
         Slots = new List<Slot>
         {
             new Slot(this, 1),
@@ -31,20 +31,33 @@ public class SnackMachine : AggregateRoot
             throw new InvalidOperationException();
         }
 
-        MoneyInTransaction += money;
+        MoneyInTransaction += money.Amount;
+        MoneyInside += money;
     }
 
     public virtual void ReturnMoney()
     {
-        MoneyInTransaction = None;
+        var moneyToReturn = MoneyInside.Allocate(MoneyInTransaction);
+        MoneyInside -= moneyToReturn;
+        MoneyInTransaction = 0;
     }
 
     public virtual void BuySnack(int positions)
     {
         var slot = GetSlot(positions);
+        if (slot.SnackPile.Price > MoneyInTransaction)
+        {
+            throw new InvalidOperationException();
+        }
         slot.SnackPile = slot.SnackPile.SubstractOne();
-        MoneyInside += MoneyInTransaction;
-        MoneyInTransaction = None;
+        var change = MoneyInside.Allocate(MoneyInTransaction - slot.SnackPile.Price);
+        if (change.Amount < MoneyInTransaction - slot.SnackPile.Price)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        MoneyInside -= change;
+        MoneyInTransaction = 0;
     }
 
     public virtual void LoadSnacks(int position, SnackPile snackPile)
@@ -54,4 +67,9 @@ public class SnackMachine : AggregateRoot
     }
 
     private Slot GetSlot(int position) => Slots.Single(x => x.Position == position);
+
+    public void LoadMoney(Money money)
+    {
+        MoneyInside += money;
+    }
 }
