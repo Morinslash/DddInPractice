@@ -1,3 +1,4 @@
+using DddInPractice.Logic.Utils;
 using NHibernate;
 using NHibernate.Event;
 

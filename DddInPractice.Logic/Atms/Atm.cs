@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using DddInPractice.Logic.Common;
 using NHibernate.Event;
 using static DddInPractice.Logic.Money;
 
@@ -40,6 +41,8 @@ public class Atm : AggregateRoot
 
         decimal amountWithCommission = CalculateAmountWithCommission(amount);
         MoneyCharged += amountWithCommission;
+        
+        AddDomainEvent(new BalanceChangedEvent(amountWithCommission));
     }
 
     private decimal CalculateAmountWithCommission(decimal amount)
